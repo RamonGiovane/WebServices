@@ -57,8 +57,10 @@ def remover(dir):
     f = dir + input("Nome do arquivo:") 
     print(f)
     try:
+        if input("Tem certeza de que deseja apagar o arquivo? Isto não pode ser desfeito. S/N") != 'S':
+            return
         r = requests.delete(f)
-        print(r.json())
+       
         if r.json()[0]['status'] == '200':
             print(f + " foi deletado.\n")
             return 
@@ -72,6 +74,9 @@ def remover(dir):
 def remover_tudo(dir):
     try:
         v = get_files(dir)
+
+        if input("Tem certeza de que deseja apagar todos os arquivos? Isto não pode ser desfeito. S/N") != 'S':
+            return
         
         for f in v:
             requests.delete(dir + f)
@@ -80,26 +85,33 @@ def remover_tudo(dir):
         print(e)
         pass
 
+def input_to_json(message):
+    dic = {}
+    dic['file-content'] = input(message)
+    return json.dumps(dic)
+
 def criar(dir):
     try:
         f = input("Nome do arquivo: ")
-        requests.put(dir+f, data=input("Conteúdo do arquivo:"))
+        requests.put(dir+f, data=input_to_json("Conteúdo do arquivo:"))
     except Exception as e:
         print("Erro: " + str(e))
 
 def atualizar(dir):
     f = input("Nome do arquivo: ")
+   
     try:
         if f in get_files(dir):
-            requests.put(dir+f, data=input("Novo conteúdo do arquivo:"))
+            requests.put(dir+f, data=input_to_json("Novo conteúdo do arquivo:"))
         else:
             print("Arquvio não encontrado.")
     except Exception as e:
         print("Erro: " + e)
 
 def definir_diretorio():
-    #dir = input("Informe o diretório: ")
-    dir = "home/aluno/Desktop/"
+    dir = input("Informe o diretório: ")
+    #dir = "/home/aluno/Desktop"
+    #dir = "C:\\Users\\ramon\\Desktop\\teste"
     if "\\" in dir:
         dir = dir.replace('\\', '/')
     if dir[-1] != '/': 

@@ -13,7 +13,10 @@ def success_message():
 
 
 def format_dir(diretorio):
-    return "/" + diretorio 
+    if ':' in diretorio:
+        return diretorio
+    else: 
+        return "/" + diretorio 
 
 @app.route('/<path:diretorio>/json', methods=['GET'])
 def get_json(diretorio):
@@ -59,14 +62,15 @@ def delete(diretorio, arquivo):
         os.remove(format_dir(diretorio) + "/" + arquivo)
         return success_message()
     except Exception as e:
-        raise(e)
+        print(e)
         return json.dumps("{'error:' : 'File not found.'}")
 
 @app.route('/<path:diretorio>/<arquivo>', methods=['PUT'])
 def put(diretorio, arquivo):
     try:
+        print(json.loads(request.data)['file-content'])
         with open(str(format_dir(diretorio))+ "/" + str(arquivo), "w") as f:
-            f.write(request.form['data'])
+            f.write(json.loads(request.data)['file-content'])
         return success_message()
     except Exception as e:
         print(e)
