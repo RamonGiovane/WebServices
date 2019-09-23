@@ -2,13 +2,15 @@ import file_manager_api
 import json
 import requests
 
-SERVER_URL = "http://127.0.0.1:7777/"
+SERVER_URL = "http://127.0.0.1:7777"
 def menu(dir):
+    #print(path + '\n')
     while True:
-        print("SELECIONE UMA OPÇÃO:\n1. Listar arquivos\n2. Exibir arquivo\n3. Remover arquivo")
+        print("\nSELECIONE UMA OPÇÃO:\n1. Listar arquivos\n2. Exibir arquivo\n3. Remover arquivo")
         print("4. Remover todos os arquivos\n5. Criar arquivo\n6. Atualizar arquivo")
         opcao =  input("Opção: ")
         path = SERVER_URL + dir
+        
         if opcao == "1":
             listar(path)
         elif opcao == "2":
@@ -28,12 +30,16 @@ def menu(dir):
 def get_files(path):
     v = []
     r = requests.get(path + "/json")
+
     for f in r.json()['files']:
         v.append(f)
+
     return v
 
 def listar(path):
-    print(get_files(path))
+  
+    for x in get_files(path):
+        print(x)
     print("")
 
 def exibir(dir):
@@ -92,12 +98,15 @@ def atualizar(dir):
         print("Erro: " + e)
 
 def definir_diretorio():
-    dir = input("Informe o diretório: ")
+    #dir = input("Informe o diretório: ")
+    dir = "home/aluno/Desktop/"
     if "\\" in dir:
         dir = dir.replace('\\', '/')
-    if dir[len(dir)-1] != '/': 
-        dir = dir + "/"
-
+    if dir[-1] != '/': 
+        dir = dir + '/'
+    if dir[0] != '/':
+        dir = '/' + dir
+    print(dir)
     return dir
 
 if __name__ == "__main__":

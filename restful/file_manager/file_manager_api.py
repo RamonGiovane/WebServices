@@ -11,51 +11,61 @@ app = Flask(__name__)
 def success_message():
     return json.dumps("[{'status' : '200'}, {notice' : 'Operation completed successfully!'}")
 
-@app.route('/<path:dir>/json', methods=['GET'])
-def get_json(dir):
+
+def format_dir(diretorio):
+    return "/" + diretorio 
+
+@app.route('/<path:diretorio>/json', methods=['GET'])
+def get_json(diretorio):
+   
     dic = {}
-    dic['files'] = os.listdir(dir)
+    dic['files'] = os.listdir(format_dir(diretorio))
     return json.dumps(dic)
 
-@app.route('/<path:dir>/content', methods=['GET'])
-def get_file(dir):
+@app.route('/<path:diretorio>/content', methods=['GET'])
+def get_file(diretorio):
+
+    
     dic = {}
     try:
-        with open(dir, 'r') as file:
-            text = file.read().replace('\n', '')
+        with open(format_dir(diretorio), 'r') as file:
+            text = file.read()#.replace('\n', '')
         dic['file-content'] = text
     except Exception as e:
         print(e)
         return json.dumps("{'error:' : 'File not found.'}")
     return json.dumps(dic)
 
-@app.route('/<path:dir>/xml', methods=['GET'])
-def get_xml(dir):
-    return  Response(dicttoxml(os.listdir(dir), custom_root="files", attr_type=False), mimetype='text/xml')  
+@app.route('/<path:diretorio>/xml', methods=['GET'])
+def get_xml(diretorio):
+    return  Response(dicttoxml(os.listdir(diretorio), custom_root="files", attr_type=False), mimetype='text/xml')  
 
-@app.route("/<path:dir>", methods=['DELETE'])
-def delete_dir(dir):
+@app.route("/<path:diretorio>", methods=['DELETE'])
+def delete_dir(diretorio):
     try:
-        os.rmdir(dir)
+        os.rmdir(format_dir(diretorio))
         return success_message()   
     
     except Exception as e:
         print(e)
         return json.dumps("{'error:' : ' Directory not found.'}")
 
-@app.route('/<path:dir>/<arquivo>', methods=['DELETE'])
-def delete(dir, arquivo):
+@app.route('/<path:diretorio>/<arquivo>', methods=['DELETE'])
+def delete(diretorio, arquivo):
+    
     try:
-        os.remove(arquivo)
+        
+        
+        os.remove(format_dir(diretorio) + "/" + arquivo)
         return success_message()
     except Exception as e:
-        print(e)
+        raise(e)
         return json.dumps("{'error:' : 'File not found.'}")
 
-@app.route('/<path:dir>/<arquivo>', methods=['PUT'])
-def put(dir, arquivo):
+@app.route('/<path:diretorio>/<arquivo>', methods=['PUT'])
+def put(diretorio, arquivo):
     try:
-        with open(str(dir)+str(arquivo), "w") as f:
+        with open(str(format_dir(diretorio))+ "/" + str(arquivo), "w") as f:
             f.write(request.form['data'])
         return success_message()
     except Exception as e:
